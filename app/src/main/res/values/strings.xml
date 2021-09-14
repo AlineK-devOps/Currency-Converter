@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Currency Converter</string>
+    <string name="last_updated">Последнее обновление:\n%1$s</string>
+    <string name="rub_currency">RUB</string>
+    <string name="char_code_format">%1$s</string>
+    <string name="name_nominal_format">%1$d %2$s</string>
+    <string name="value_format">@string/char_code_format</string>
+</resources>
