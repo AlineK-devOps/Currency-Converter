@@ -2,6 +2,7 @@ package com.example.currencyconverter.data
 
 import com.example.currencyconverter.CurrenciesDatasource
 import com.example.currencyconverter.CurrenciesDatasourceImpl
+import com.example.currencyconverter.model.Currency
 import com.example.currencyconverter.model.DataModel
 import com.google.gson.GsonBuilder
 import io.reactivex.Single
@@ -34,13 +35,28 @@ class CurrencyRepositoryImpl private constructor(
         }
     }
 
-    override fun getValute(): Single<DataModel> =
-        currenciesDatasource.getValute()
-
     override fun setModel(model: DataModel){
         currenciesDatasource.setModel(model)
     }
 
     override fun getModel(): DataModel =
         currenciesDatasource.getModel()
+
+    override fun getListOfCurrencies(): List<Currency> =
+        currenciesDatasource.getListOfCurrencies()
+
+    override fun getCharCodes(): List<String> =
+        currenciesDatasource.getCharCodes()
+
+    override fun getTime(): String =
+        currenciesDatasource.getTime()
+
+    override fun getPosition(currency: Currency): Int =
+        currenciesDatasource.getPosition(currency)
+
+    override fun getCurrency(pos: Int): Currency =
+        currenciesDatasource.getCurrency(pos)
+
+    override fun getValute(): Single<DataModel> =
+        currenciesDatasource.getValute()
 }

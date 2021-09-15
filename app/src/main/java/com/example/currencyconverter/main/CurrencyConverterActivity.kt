@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.currencyconverter.R
 import com.example.currencyconverter.model.Currency
 import com.example.currencyconverter.data.CurrencyRepositoryImpl
-import android.text.Editable
 
-import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 
@@ -45,7 +43,7 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         presenter.attachView(this)
 
         rubbles = findViewById(R.id.rubblesEt)
-        rubbles.addTextChangedListener { presenter.calculate(
+        rubbles.addTextChangedListener { presenter.editTextUpdate(
             rubbles.text.toString(),
             spinner.selectedItemPosition
         ) }
@@ -55,7 +53,7 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 clearOtherCurrency()
-                presenter.calculate(rubbles.text.toString(), position)
+                presenter.editTextUpdate(rubbles.text.toString(), position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -105,7 +103,7 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         spinner.setSelection(pos)
     }
 
-    fun clearOtherCurrency() {
+    override fun clearOtherCurrency() {
         otherCurrency.setText("")
     }
 }

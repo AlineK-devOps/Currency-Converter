@@ -9,4 +9,5 @@ interface CurrencyConverterView : BaseView {
     fun bindUpdateTime(time: String)
     fun updateConverter(otherCurrency: Double)
     fun setSpinnerSelection(pos: Int)
+    fun clearOtherCurrency()
 }
