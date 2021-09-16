@@ -22,6 +22,8 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
 
     private val adapter by lazy { CurrencyAdapter(presenter::onCurrencyClicked) }
 
+    private lateinit var prefs: SharedPreferences
+
     private lateinit var currencyList: RecyclerView
     private lateinit var lastUpdateText: TextView
     private lateinit var rubbles: EditText
@@ -29,14 +31,11 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
     private lateinit var spinner: Spinner
     private lateinit var updateButton: ImageButton
 
-    private lateinit var prefs: SharedPreferences
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_currency_converter)
 
         prefs = getSharedPreferences(CurrencyRepositoryImpl.APP_PREFERENCES, MODE_PRIVATE)
-
         presenter.attachView(this)
 
         rubbles = findViewById(R.id.rubblesEt)
@@ -44,7 +43,6 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
             rubbles.text.toString(),
             spinner.selectedItemPosition
         ) }
-
 
         spinner = findViewById(R.id.otherCurrencySpinner)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -61,12 +59,12 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
             presenter.onUpdateButtonClicked()
         }
 
-        otherCurrency = findViewById(R.id.otherCurrencyEt)
-        lastUpdateText = findViewById(R.id.lastUpdateText)
-
         currencyList = findViewById(R.id.currenciesList)
         currencyList.adapter = adapter
         currencyList.layoutManager = LinearLayoutManager(this)
+
+        otherCurrency = findViewById(R.id.otherCurrencyEt)
+        lastUpdateText = findViewById(R.id.lastUpdateText)
     }
 
     override fun onStart() {
@@ -90,10 +88,10 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         super.onRestoreInstanceState(savedInstanceState)
 
         if (savedInstanceState.containsKey("rubbles") && savedInstanceState.containsKey("position")){
-            val r = savedInstanceState.getString("rubbles")
-            rubbles.setText(r)
-            val i = savedInstanceState.getInt("position")
-            setSpinnerSelection(i)
+            val rub = savedInstanceState.getString("rubbles")
+            rubbles.setText(rub)
+            val pos = savedInstanceState.getInt("position")
+            setSpinnerSelection(pos)
         }
     }
 
@@ -112,6 +110,7 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         adapter.currencies = currencies
     }
 
+    //очищаем список
     override fun clearCurrencies() {
         adapter.currencies = emptyList()
     }
@@ -121,7 +120,7 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         lastUpdateText.text = getString(R.string.last_updated, time)
     }
 
-    //обновляем поля конвертера
+    //обновляем значение второй валюты
     override fun updateConverter(otherCurrency: Double) {
         this.otherCurrency.setText(String.format("%.4f", otherCurrency))
     }

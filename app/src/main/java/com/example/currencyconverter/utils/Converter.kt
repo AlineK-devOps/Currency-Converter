@@ -1,7 +1,7 @@
-package com.example.currencyconverter
+package com.example.currencyconverter.utils
 
 object Converter {
-    //рубли в другую валюту
+    //перевод рублей в другую валюту
     fun convertRubToOther(rubbles: Double, rate: Double, nominal: Int) =
         rubbles * rate / nominal
 }

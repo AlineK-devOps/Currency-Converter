@@ -3,7 +3,7 @@ package com.example.currencyconverter.main
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.currencyconverter.Converter
+import com.example.currencyconverter.utils.Converter
 import com.example.currencyconverter.base.BasePresenter
 import com.example.currencyconverter.model.Currency
 import com.example.currencyconverter.data.CurrencyRepository
@@ -65,11 +65,9 @@ class CurrencyConverterPresenter(private val repository: CurrencyRepository) : B
         else view?.clearOtherCurrency()
      }
 
-    //устанавливаем views значения
+    //устнавливаем данные
     private fun bindActivity(){
-        val currencies = repository.getListOfCurrencies()
-
-        view?.bindCurrencies(currencies)
+        view?.bindCurrencies(repository.getListOfCurrencies())
         view?.bindUpdateTime(repository.getTime())
         view?.bindCharCodes(repository.getCharCodes())
     }
