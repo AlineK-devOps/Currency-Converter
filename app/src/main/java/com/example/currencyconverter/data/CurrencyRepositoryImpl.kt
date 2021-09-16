@@ -1,5 +1,6 @@
 package com.example.currencyconverter.data
 
+import android.content.SharedPreferences
 import com.example.currencyconverter.CurrenciesDatasource
 import com.example.currencyconverter.CurrenciesDatasourceImpl
 import com.example.currencyconverter.model.Currency
@@ -18,6 +19,7 @@ class CurrencyRepositoryImpl private constructor(
 
     companion object{
         var BASE_URL = "https://www.cbr-xml-daily.ru/"
+        var APP_PREFERENCES = "data_model"
 
         private var repository: CurrencyRepositoryImpl? = null
 

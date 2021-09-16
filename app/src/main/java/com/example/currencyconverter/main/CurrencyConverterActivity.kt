@@ -1,11 +1,8 @@
 package com.example.currencyconverter.main
 
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,12 +11,7 @@ import com.example.currencyconverter.model.Currency
 import com.example.currencyconverter.data.CurrencyRepositoryImpl
 
 import android.view.View
-import android.widget.AdapterView
-
-
-
-
-
+import android.widget.*
 
 
 class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
@@ -35,10 +27,15 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
     private lateinit var rubbles: EditText
     private lateinit var otherCurrency: EditText
     private lateinit var spinner: Spinner
+    private lateinit var updateButton: ImageButton
+
+    private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_currency_converter)
+
+        prefs = getSharedPreferences(CurrencyRepositoryImpl.APP_PREFERENCES, MODE_PRIVATE)
 
         presenter.attachView(this)
 
@@ -59,6 +56,10 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
+        updateButton = findViewById(R.id.updateButton)
+        updateButton.setOnClickListener {
+            presenter.onUpdateButtonClicked()
+        }
 
         otherCurrency = findViewById(R.id.otherCurrencyEt)
         lastUpdateText = findViewById(R.id.lastUpdateText)
@@ -68,9 +69,32 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         currencyList.layoutManager = LinearLayoutManager(this)
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.onScreenResumed()
+    override fun onStart() {
+        super.onStart()
+        presenter.onScreenStarted(prefs)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.onScreenPaused(prefs)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("rubbles", rubbles.text.toString())
+        outState.putInt("position", spinner.selectedItemPosition)
+        rubbles.setText("")
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        if (savedInstanceState.containsKey("rubbles") && savedInstanceState.containsKey("position")){
+            val r = savedInstanceState.getString("rubbles")
+            rubbles.setText(r)
+            val i = savedInstanceState.getInt("position")
+            setSpinnerSelection(i)
+        }
     }
 
     //заполняем спиннер
@@ -103,6 +127,7 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         spinner.setSelection(pos)
     }
 
+    //очищаем поле с второй валютой
     override fun clearOtherCurrency() {
         otherCurrency.setText("")
     }
