@@ -1,6 +1,8 @@
 package com.example.currencyconverter.main
 
 import android.content.SharedPreferences
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.currencyconverter.Converter
 import com.example.currencyconverter.base.BasePresenter
 import com.example.currencyconverter.model.Currency
@@ -10,17 +12,26 @@ import com.example.currencyconverter.model.DataModel
 import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class CurrencyConverterPresenter(private val repository: CurrencyRepository) : BasePresenter<CurrencyConverterView>() {
 
     //активность стартует
     fun onScreenStarted(prefs: SharedPreferences){
+        //проверяем существует ли сохраненная копия курсов
         if (!prefs.contains(CurrencyRepositoryImpl.APP_PREFERENCES)){
-            loadDataFromNet()
+            loadDataFromNet() //не существует - загружаем данные из сети
         }
         else{
-            loadDataFromPrefs(prefs)
-            bindActivity()
+            loadDataFromPrefs(prefs) //существует - достаём копию
+
+            //проверяем нужно ли обновить копию
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && needToUpdate(repository.getTime()))
+                loadDataFromNet()
+            else
+                bindActivity()
         }
     }
 
@@ -33,6 +44,7 @@ class CurrencyConverterPresenter(private val repository: CurrencyRepository) : B
 
     //нажата кнопка обновления курсов валют
     fun onUpdateButtonClicked(){
+        view?.clearCurrencies()
         loadDataFromNet()
     }
 
@@ -88,5 +100,19 @@ class CurrencyConverterPresenter(private val repository: CurrencyRepository) : B
         val json = Gson().toJson(repository.getModel())
         editor.putString(CurrencyRepositoryImpl.APP_PREFERENCES, json)
         editor.apply()
+    }
+
+    //прошло ли больше суток с последнего обновления
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun needToUpdate(loadDate: String): Boolean{
+        val parsedDate = LocalDateTime.parse(loadDate, DateTimeFormatter.ofPattern("y-M-d H:m:s"))
+
+        if (parsedDate != null){
+            val hours = parsedDate.until(LocalDateTime.now(), ChronoUnit.HOURS)
+
+            if (hours >= 24)
+                return true
+        }
+        return false
     }
 }

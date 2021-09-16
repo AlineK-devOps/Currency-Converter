@@ -80,7 +80,6 @@
                 android:id="@+id/lastUpdateText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/last_updated"
                 android:layout_gravity="center_vertical"
                 android:textColor="@color/gray_200"
                 android:textSize="16sp"

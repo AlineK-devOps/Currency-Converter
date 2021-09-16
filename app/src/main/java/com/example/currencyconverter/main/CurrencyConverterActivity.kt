@@ -112,6 +112,10 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
         adapter.currencies = currencies
     }
 
+    override fun clearCurrencies() {
+        adapter.currencies = emptyList()
+    }
+
     //заполняем дату и время загрузки
     override fun bindUpdateTime(time: String) {
         lastUpdateText.text = getString(R.string.last_updated, time)
