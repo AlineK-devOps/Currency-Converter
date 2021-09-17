@@ -74,7 +74,7 @@ class CurrencyConverterActivity : AppCompatActivity(), CurrencyConverterView {
 
     override fun onPause() {
         super.onPause()
-        presenter.onScreenPaused(prefs)
+        presenter.onScreenPaused()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

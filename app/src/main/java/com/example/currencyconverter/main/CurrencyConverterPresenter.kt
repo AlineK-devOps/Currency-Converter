@@ -18,14 +18,18 @@ import java.time.temporal.ChronoUnit
 
 class CurrencyConverterPresenter(private val repository: CurrencyRepository) : BasePresenter<CurrencyConverterView>() {
 
+    private lateinit var prefs: SharedPreferences
+
     //активность стартует
     fun onScreenStarted(prefs: SharedPreferences){
+        this.prefs = prefs
+
         //проверяем существует ли сохраненная копия курсов
         if (!prefs.contains(CurrencyRepositoryImpl.APP_PREFERENCES)){
             loadDataFromNet() //не существует - загружаем данные из сети
         }
         else{
-            loadDataFromPrefs(prefs) //существует - достаём копию
+            loadDataFromPrefs() //существует - достаём копию
 
             //проверяем нужно ли обновить копию
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && needToUpdate(repository.getTime()))
@@ -36,9 +40,9 @@ class CurrencyConverterPresenter(private val repository: CurrencyRepository) : B
     }
 
     //окно прерывается
-    fun onScreenPaused(prefs: SharedPreferences){
+    fun onScreenPaused(){
         if (!prefs.contains(CurrencyRepositoryImpl.APP_PREFERENCES)){
-            saveDataToPrefs(prefs)
+            saveDataToPrefs()
         }
     }
 
@@ -79,6 +83,7 @@ class CurrencyConverterPresenter(private val repository: CurrencyRepository) : B
             .subscribeBy(
                 onSuccess = {
                     repository.setModel(it)
+                    saveDataToPrefs()
                     bindActivity()
                 }
             )
@@ -87,13 +92,13 @@ class CurrencyConverterPresenter(private val repository: CurrencyRepository) : B
 
 
     //загружаем объект из prefs
-    private fun loadDataFromPrefs(prefs: SharedPreferences){
+    private fun loadDataFromPrefs(){
         val json = prefs.getString(CurrencyRepositoryImpl.APP_PREFERENCES, "")
         repository.setModel(Gson().fromJson(json, DataModel::class.java))
     }
 
     //сохраняем объект в prefs
-    private fun saveDataToPrefs(prefs: SharedPreferences){
+    private fun saveDataToPrefs(){
         val editor = prefs.edit()
         val json = Gson().toJson(repository.getModel())
         editor.putString(CurrencyRepositoryImpl.APP_PREFERENCES, json)
